@@ -1,0 +1,10 @@
+{
+  "https://data-api.polymarket.com/user-pnl?user_address=0xca12a788a13a0c46968828a125ccbc09cea2ea73&interval=all&fidelity=1d": {
+    "status": 404,
+    "body": "404 page not found\n"
+  },
+  "https://data-api.polymarket.com/positions/value?user=0xca12a788a13a0c46968828a125ccbc09cea2ea73": {
+    "status": 404,
+    "body": "404 page not found\n"
+  }
+}
