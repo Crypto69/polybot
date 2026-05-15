@@ -14,8 +14,15 @@ const mode = computed(() => {
   return d[d.length - 1].dry_run === 0 ? 'LIVE' : 'DRY'
 })
 
-// Bot liveness: the journal is its heartbeat. Fresh row in the last 12s ⇒ the
-// trading loop is running. Goes stale the moment the bot stops.
+// Bot liveness: the journal is its heartbeat. The live loop's write cadence is
+// irregular — it only records book_ticks for markets inside the 300s
+// observation window and does heavy blocking I/O per tick (spot, account
+// state, books, an 8s positions API). Measured on a healthy live bot: ~18s
+// avg gap between journal rows, p95 ~34s, max ~36s, and never >60s. So a tight
+// threshold makes the badge flap STOPPED↔LIVE on every normal gap. 90s sits
+// ~2.5x above the observed ceiling: no false "stopped" while healthy, still
+// detects a truly stopped bot within ~1.5 min.
+const BOT_STALE_SEC = 90
 const lastSeen = computed(() => {
   const tick = props.store.latestTick?.ts || 0
   const ds = props.store.decisions
@@ -23,7 +30,7 @@ const lastSeen = computed(() => {
   return Math.max(tick, dec)
 })
 const botLive = computed(() =>
-  lastSeen.value > 0 && now.value / 1000 - lastSeen.value < 12)
+  lastSeen.value > 0 && now.value / 1000 - lastSeen.value < BOT_STALE_SEC)
 
 // Trading pair / windows currently open.
 const pair = computed(() => {
