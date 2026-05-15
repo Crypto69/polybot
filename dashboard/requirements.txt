@@ -1,0 +1,4 @@
+# Dashboard-only deps. Kept separate from the bot's minimal requirements.txt
+# so the trading loop's runtime footprint stays unchanged.
+fastapi>=0.115
+uvicorn[standard]>=0.34

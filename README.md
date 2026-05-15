@@ -400,8 +400,57 @@ python scripts/prepare_live_b.py
 python -m bot.main --live                  # only when the above looks good
 ```
 
+---
+
+## 15. Optional: watch it live (the dashboard)
+
+There's a real-time **terminal-style dashboard** so you can watch the bot think
+instead of squinting at log lines. It's a separate, **read-only** program: it
+only *reads* the same `trades.db` the bot writes, so it's safe to run at the same
+time as the bot — even in live mode. It never places orders and never touches the
+bot's data.
+
+![Polybot live dashboard](docs/dashboard.png)
+
+**What you're looking at:**
+
+- **Top bar** — `LIVE`/`DRY` mode, the markets being traded (`BTC 5M·15M`), a
+  **BOT LIVE/STOPPED** light (green while the bot is running, red the moment it
+  stops), an **API LIVE** light (the dashboard's own connection), the live BTC
+  price, and the clock.
+- **Left column** —
+  - **Wallet / Equity:** your deposit & signing addresses, on-chain **pUSD cash**,
+    the value tied up in open positions, and **total equity**.
+  - **P&L — Realised:** net profit after fees (big number), plus gross, fees,
+    win-rate and per-trade average. Toggle **ALL / LIVE / DRY**.
+  - **Strategy:** the live settings from `bot/config.py` (entry cap, floor,
+    timing window, size, and the safety caps).
+- **Centre** — the **Decision log**: every BUY/SKIP the bot makes, streamed as it
+  happens, with an **equity curve** building underneath as markets settle.
+- **Right** — **Open positions** (with a countdown to settlement), **Orders**
+  (real placements and their status), and the **Market clock** (open windows
+  counting down; the action window is highlighted).
+- When a real trade is placed the whole screen does a **5-second amber blink**
+  with a beep, so you can't miss it.
+
+**How to run it** (one-time setup, then start it whenever you want to watch):
+
+```bash
+.venv/bin/pip install -r dashboard/requirements.txt   # one-time
+cd dashboard/frontend && npm install && npm run build && cd -   # one-time
+python dashboard/server.py                              # then open http://127.0.0.1:8787
+```
+
+Full details (dev mode with hot-reload, how P&L is calculated, etc.) are in
+[`dashboard/README.md`](dashboard/README.md). It binds to `127.0.0.1` only — it's
+a local tool; don't expose it to the internet.
+
+---
+
 > A more technical version of this guide also lives at
 > [`docs/SETUP.md`](docs/SETUP.md). Architecture notes are in
 > [`CLAUDE.md`](CLAUDE.md); the strategy evidence is in
 > [`docs/research/PLAN.md`](docs/research/PLAN.md) and
 > [`docs/YouTube strategy.MD`](docs/YouTube%20strategy.MD).
+> The live dashboard is documented in
+> [`dashboard/README.md`](dashboard/README.md).

@@ -20,6 +20,10 @@ logs/*
 *.sqlite
 *.sqlite3
 
+# Dashboard frontend build artifacts
+dashboard/frontend/node_modules/
+dashboard/frontend/dist/
+
 # OS
 .DS_Store
 
