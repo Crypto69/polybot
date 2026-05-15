@@ -35,12 +35,24 @@ Operational scripts (each is standalone — `python scripts/<name>.py`):
 
 There is no test suite or linter wired up. The journal in `trades.db` (created on first run) **is** the test feedback loop — run dry-run for an hour, then `scripts/backtest.py` to evaluate hypothetical fills.
 
+Real-time dashboard (optional, read-only — safe to run alongside a live bot):
+
+```bash
+.venv/bin/pip install -r dashboard/requirements.txt          # one-time
+cd dashboard/frontend && npm install && npm run build && cd - # one-time
+python dashboard/server.py                                    # → http://127.0.0.1:8787
+```
+
+See `dashboard/README.md` for dev mode (Vite hot-reload) and details.
+
 ## Architecture
 
 Two top-level packages with distinct responsibilities — do not merge them:
 
 - **`bot/`** — the trading loop and its inputs. All higher-level logic.
 - **`polybot/`** — minimal web3/Polygon helpers (RPC, account, contract addresses, ABI fragments). Imported by `bot/` and by `scripts/`. Kept separate so scripts can use chain primitives without dragging in the trading loop.
+
+`dashboard/` is a **separate process**, not part of the trading code — see "Dashboard" below. It may *import read-only helpers* from `bot/` (config, `markets.fetch_resolution`, `account.fetch_pusd_balance`) but the dependency is strictly one-directional: `bot/` must never import `dashboard/`.
 
 ### `bot/` module relationships
 
@@ -67,6 +79,17 @@ main.py ──► markets.py    (discover_open_markets — probes gamma API by s
 - **Live** instantiates `Trader` once (lazy SDK client), polls `AccountState` each tick, and gates every BUY through `risk.allowed_to_trade` (cooldown, position dedup, balance floor, daily loss cap). Stale-order cancel sweep runs every 5 s.
 
 Because `book_ticks` is recorded in both modes, the backtester can replay the same ticks under different parameter values without ever needing live data.
+
+### Dashboard (dashboard/) — read-only monitor
+
+A FastAPI + Vue 3 process that tails `trades.db` and streams it to a terminal-style UI over WebSocket. **Hard invariants — do not break them:**
+
+- **Strictly read-only and decoupled.** It opens SQLite with `mode=ro`, never writes the journal, never holds a write lock, and never imports the trading loop (`bot.main`/`trader`/`risk`). It must remain safe to run while the bot trades live. Any change that adds a write path or a `bot/` runtime dependency is wrong.
+- **P&L is single-sourced with `scripts/analyze_dry_run.py`.** `server.py`'s `_trade_pnl()` uses the identical accounting (win `(1-price)*size`, loss `-price*size`, fee `0.07*(1-price)^1 * size*price`). If the fee model in `docs/research/PLAN.md` / `markets.fee_for_buy` changes, update **all three** together or they will disagree.
+- **Backend deps stay in `dashboard/requirements.txt`**, never the bot's `requirements.txt` — the trading loop's runtime footprint must not grow for a monitor.
+- Frontend build artifacts (`dashboard/frontend/node_modules/`, `dist/`) are gitignored; `server.py` serves `dist/` if present, else use Vite dev mode. It binds `127.0.0.1` only and trusts any local client — never expose it.
+
+The dashboard derives realised P&L by enriching BUY `decisions` with market resolutions (`markets.fetch_resolution`); it does **not** rely on the `orders`/`outcomes` tables (orders frequently error without filling). Decision-level P&L = strategy edge; the Orders panel separately shows actual placement status.
 
 ### Two auth paths (auth.py)
 
