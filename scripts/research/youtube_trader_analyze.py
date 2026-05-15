@@ -15,7 +15,7 @@ from pathlib import Path
 
 import requests
 
-DATA = Path("/Volumes/ExternalHD/code/polybot/research/data")
+DATA = Path("/Volumes/ExternalHD/code/polybot/docs/research/data")
 CLOB = "https://clob.polymarket.com"
 
 

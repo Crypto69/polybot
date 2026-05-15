@@ -1,6 +1,6 @@
 """Pull complete trade + activity history for the target trader.
 
-Saves to /Volumes/ExternalHD/code/polybot/research/data/
+Saves to /Volumes/ExternalHD/code/polybot/docs/research/data/
 """
 import json
 import os
@@ -10,7 +10,7 @@ from pathlib import Path
 import requests
 
 ADDR = "0xeebde7a0e019a63e6b476eb425505b7b3e6eba30"
-OUT = Path("/Volumes/ExternalHD/code/polybot/research/data")
+OUT = Path("/Volumes/ExternalHD/code/polybot/docs/research/data")
 OUT.mkdir(parents=True, exist_ok=True)
 
 # data-api.polymarket.com supports limit + offset on /trades and /activity

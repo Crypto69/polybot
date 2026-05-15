@@ -12,7 +12,7 @@ import requests
 
 ADDR = "0xeebde7a0e019a63e6b476eb425505b7b3e6eba30"
 ROOT = Path(__file__).resolve().parents[2]
-OUT = ROOT / "research" / "bonereaper_trades_raw.json"
+OUT = ROOT / "docs" / "research" / "bonereaper_trades_raw.json"
 OUT.parent.mkdir(parents=True, exist_ok=True)
 
 session = requests.Session()

@@ -14,7 +14,7 @@ Both addresses link to the same profile per `data-api.polymarket.com`. The proxy
 
 ## Trading footprint
 
-Source: `https://data-api.polymarket.com/trades?user=0xca12...ea73` paginated to exhaustion (`research/data/yt_proxy_trades.json`, 143 rows).
+Source: `https://data-api.polymarket.com/trades?user=0xca12...ea73` paginated to exhaustion (`docs/research/data/yt_proxy_trades.json`, 143 rows).
 
 | Metric | Value |
 |---|---|
@@ -70,4 +70,4 @@ That said, this is a tiny sample (47 h, $660 volume) and the loss is small enoug
 
 ---
 
-*Sources: `data-api.polymarket.com/trades` & `/positions` & `/value` (proxy wallet, 143 trades pulled 2026-05-14). Win/loss verified per-market via `clob.polymarket.com/markets/<conditionId>`. Raw data and scripts under `/Volumes/ExternalHD/code/polybot/research/data/yt_proxy_*.json` and `/Volumes/ExternalHD/code/polybot/scripts/research/youtube_trader_{pull,analyze}.py`.*
+*Sources: `data-api.polymarket.com/trades` & `/positions` & `/value` (proxy wallet, 143 trades pulled 2026-05-14). Win/loss verified per-market via `clob.polymarket.com/markets/<conditionId>`. Raw data and scripts under `/Volumes/ExternalHD/code/polybot/docs/research/data/yt_proxy_*.json` and `/Volumes/ExternalHD/code/polybot/scripts/research/youtube_trader_{pull,analyze}.py`.*

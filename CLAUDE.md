@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Trading bot for Polymarket's recurring BTC up/down markets (5-min and 15-min windows). Strategy is "late-window convergence" — see `research/PLAN.md` for the empirical basis (derived from analyzing a profitable trader's 4,000+ on-chain trades). The bot does **not** predict BTC direction; it waits until one outcome is already mathematically near-decided, then buys it at a discount to $1.00 with an independent BTC spot reading as a cross-check.
+Trading bot for Polymarket's recurring BTC up/down markets (5-min and 15-min windows). Strategy is "late-window convergence" — see `docs/research/PLAN.md` for the empirical basis (derived from analyzing a profitable trader's 4,000+ on-chain trades). The bot does **not** predict BTC direction; it waits until one outcome is already mathematically near-decided, then buys it at a discount to $1.00 with an independent BTC spot reading as a cross-check.
 
 ## Commands
 
@@ -87,8 +87,9 @@ Polymarket settles in **pUSD** (`polymarket.md` and `polymarketUSD.md` are mirro
 
 These three are coupled — when calibrating from `book_ticks`, sweep them as a grid (see `scripts/backtest.py`):
 
-- `max_entry_price` (default 0.95) — hard ceiling per share; **also** the price used for the `buyable_at_cap` liquidity check in `book.py`.
-- `seconds_before_close` (default 240) — the action window. Outside it, the loop records ticks but never decides BUY.
+- `max_entry_price` (default 0.90, narrowed from 0.95) — hard ceiling per share; **also** the price used for the `buyable_at_cap` liquidity check in `book.py`. Targets the 0.85–0.90 bucket only (the ~break-even band per the YouTube trader's data).
+- `seconds_before_close` (default 35, tightened from 240 per "YouTube refinement #3") — the action window. Outside it, the loop records ticks but never decides BUY.
+- `book_observation_seconds` (default 300) — separate, wider window for *recording* book snapshots into `book_ticks`. The journal captures the full last 5 min even though entries only fire in the last 35 s, so the backtester can replay surrounding context.
 - `spot_confidence_bps` (default 5) — minimum BTC move from window open required before the spot signal is trusted as a directional confirmation.
 
-`research/PLAN.md` documents the empirical fee model: **taker fee = `fee_rate * (1 - price) ^ exponent`**, fee_rate=0.07, exponent=1. Fee is highest at low prices (the opposite of what some third-party docs claim). This is why entering at $0.99 is unprofitable for our scale: the fee eats the gross edge.
+`docs/research/PLAN.md` documents the empirical fee model: **taker fee = `fee_rate * (1 - price) ^ exponent`**, fee_rate=0.07, exponent=1. Fee is highest at low prices (the opposite of what some third-party docs claim). This is why entering at $0.99 is unprofitable for our scale: the fee eats the gross edge.

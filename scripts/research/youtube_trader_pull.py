@@ -10,7 +10,7 @@ from pathlib import Path
 
 import requests
 
-OUT_DIR = Path("/Volumes/ExternalHD/code/polybot/research/data")
+OUT_DIR = Path("/Volumes/ExternalHD/code/polybot/docs/research/data")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 EOA = "0x95C6603e5dCaEaD9Be26549d8ea2bF23B67Ed1B5"

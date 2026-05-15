@@ -14,7 +14,7 @@ load_dotenv(REPO_ROOT / ".env")
 @dataclass(frozen=True)
 class Config:
     # --- Strategy knobs ---
-    max_entry_price: float = 0.95          # YouTube tutorial kept at 0.95 (didn't raise to 0.96)
+    max_entry_price: float = 0.90          # narrowed from 0.95 to ride only the 0.85-0.90 bucket (the only ~break-even band per YouTube trader's data)
     low_price_floor: float = 0.85          # raised from 0.55 per YouTube refinement #1
     seconds_before_close: int = 35         # tightened from 240 per YouTube refinement #3 — last 35s only
     min_t_remaining_seconds: int = 8       # YouTube refinement #4: don't fire in final ~7s (avoid losing race to liquidity-takers)

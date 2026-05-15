@@ -10,7 +10,7 @@ from pathlib import Path
 import requests
 
 ADDR = "0xeebde7a0e019a63e6b476eb425505b7b3e6eba30"
-OUT = Path("/Volumes/ExternalHD/code/polybot/research/data")
+OUT = Path("/Volumes/ExternalHD/code/polybot/docs/research/data")
 OUT.mkdir(parents=True, exist_ok=True)
 BASE = "https://data-api.polymarket.com"
 
