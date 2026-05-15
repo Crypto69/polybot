@@ -1,5 +1,12 @@
 # Polybot — A Beginner's Manual
 
+> **Credit / source.** This entire project is based on the awesome
+> **AllAboutAI** YouTube channel — <http://www.youtube.com/@AllAboutAI> — and
+> follows the instructions in this video:
+> <https://youtu.be/0ZJXpMZobjY?si=-BPGlgS_QGUzMysj>.
+> All credit for the original strategy and walkthrough goes to that channel;
+> this repository is just our own implementation, notes, and safety tweaks.
+
 This is a step-by-step manual for someone who has **never done this before**.
 Every step says **what to do**, the **exact command to type**, and **why you're
 doing it**. You don't need any other document — everything is explained here.
