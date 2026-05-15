@@ -130,6 +130,64 @@ if anything our realised win rate at a given price is **worse** than theirs.
 > (+$0.21). Expect to lose capital slowly; the value here is the data and the
 > learning, with kill-switches capping the downside.
 
+## 9. Live run analysis (from `trades.db`, 2026-05-14 → 2026-05-15)
+
+We ran the bot live and queried the journal. **The single most important
+finding: the strategy was never actually executed live — every order was
+geo-blocked.**
+
+### 9.1 Zero fills — Polymarket geo-block
+
+All 5 live order attempts failed with the *identical* error:
+
+> `PolyApiException[status_code=403, error_message={'error': 'Trading
+> restricted in your region, please refer to available regions'}]`
+
+`orders` table: **5 rows, all `status=ERROR`, zero `matched`/`live`.** No
+contract was ever bought. There is **no real live P&L** — the live strategy
+remains unvalidated, and cannot be run from this region without a compliant
+setup. (Note: this database contains no record of any successful live trade at
+all; any earlier loss occurred outside what is journaled here.)
+
+### 9.2 Decision behaviour over ~20 h live observation
+
+853 live decisions across 106 markets / 7,554 book ticks
+(2026-05-14 13:00 → 2026-05-15 09:00 UTC):
+
+| Outcome | Count | % | Read |
+|---|---|---|---|
+| SKIP — no entry-priced supply in $0.85–$0.90 | 616 | 72% | The narrowed band rarely presents a clean entry — strategy is very selective |
+| SKIP — too late, <8 s buffer | 211 | 25% | **Latency, measured.** The setup appeared but the bot couldn't act in time |
+| BUY fired | 10 | 1% | 10 ticks across only **6 distinct markets** (per-market dedup) |
+| SKIP — spot below confidence | 9 | 1% | spot cross-check filtering |
+| SKIP — spot disagreed with book | 7 | 1% | spot cross-check filtering |
+
+The **211 "too late" skips (25%)** are the key empirical result: this is the
+retail-latency risk flagged in `PLAN.md`, now *observed* — even when a valid
+setup exists, on a public RPC + laptop the bot routinely misses the <8 s window.
+
+### 9.3 Counterfactual (if orders had filled) — statistically meaningless
+
+For the 6 distinct markets the bot tried to enter, all 6 resolved in the bot's
+favour (6/6), counterfactual ≈ **+$2.25** (4 sh × $0.90, win → +$0.375, fee
+$0.025). **This proves nothing.** At $0.90 entry one loss is −$3.60 and erases
+~10 wins; 6 trades cannot distinguish "edge" from "got lucky in a near-decided
+band." It is fully consistent with the Section 4 conclusion that the strategy
+needs ≥90% win rate at $0.90 and doesn't reliably clear it. Short-run high win
+rate in a near-decided band is *expected by construction*, not evidence of edge.
+
+### 9.4 Live-run conclusions
+
+1. **Strategy unvalidated live** — geo-block means 0 fills. Any live verdict is
+   impossible until trading is run from a permitted region/setup.
+2. **Latency is real and measured** — 25% of would-be entries missed the timing
+   buffer. This makes our realised win rate likely *worse* than the AllAboutAI
+   bot's, reinforcing Section 6.
+3. **The band is sparse** — 72% of the time no clean $0.85–$0.90 entry exists,
+   so trade frequency (and any edge) is low even before latency loss.
+4. Nothing here overturns Section 8: **no demonstrated edge.** The live data
+   adds two confirmations (geo-block, latency) and zero evidence of profit.
+
 ### Sources
 - `PLAN.md` — original strategy thesis, fee verification, phased plan.
 - `youtube_tutorial_trader.md` — AllAboutAI bot identity + −$14.54 result.
